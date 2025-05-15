@@ -18,7 +18,7 @@ services:
     ports:
       - "6541:5432"
     volumes:
-      - postgres:/var/lib/postgresql/data
+      - /var/lib/postgresql/data
     environment:
       POSTGRES_USER: stats
       POSTGRES_PASSWORD: stats
@@ -42,7 +42,7 @@ services:
     ports:
       - "6542:5432"
     volumes:
-      - postgres:/var/lib/postgresql/data
+      - /var/lib/postgresql/data
     environment:
       POSTGRES_USER: ewm
       POSTGRES_PASSWORD: ewm
