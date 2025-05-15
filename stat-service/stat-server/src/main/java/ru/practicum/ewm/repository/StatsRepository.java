@@ -9,10 +9,10 @@ import ru.practicum.ewm.model.Stats;
 import java.time.LocalDateTime;
 import java.util.List;
 
-public interface StatsRepository extends JpaRepository<EndpointHit, Integer> {
+public interface StatsRepository extends JpaRepository<EndpointHit, Long> {
     @Query("""
             SELECT new ru.practicum.ewm.model.Stats(h.app, h.uri, COUNT(h.ip))
-            FROM endpoint_hits as h
+            FROM EndpointHit as h
             WHERE h.timestamp BETWEEN :start AND :end
             AND (:uris IS NULL OR h.uri IN :uris)
             GROUP BY h.app, h.uri
@@ -24,7 +24,7 @@ public interface StatsRepository extends JpaRepository<EndpointHit, Integer> {
 
     @Query("""
             SELECT new ru.practicum.ewm.model.Stats(h.app, h.uri, COUNT(DISTINCT h.ip))
-            FROM endpoint_hits as h
+            FROM EndpointHit as h
             WHERE h.timestamp BETWEEN :start AND :end
             AND (:uris IS NULL OR h.uri IN :uris)
             GROUP BY h.app, h.uri

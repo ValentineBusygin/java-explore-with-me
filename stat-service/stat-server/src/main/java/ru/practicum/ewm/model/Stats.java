@@ -8,5 +8,5 @@ import lombok.Getter;
 public class Stats {
     private String app;
     private String uri;
-    private Integer hits;
+    private Long hits;
 }
