@@ -2,12 +2,12 @@ server:
   port: '8080'
 
 stat-service:
-  url: 'http://localhost:8081'
+  url: 'http://localhost:9090'
 
 spring:
     datasource:
       driverCLassName: org.postgresql.Driver
-      url: jdbc:postgresql://localhost:6542/ewm-db
+      url: jdbc:postgresql://localhost:5432/ewm-db
       username: ewm
       password: ewm
     jpa:
