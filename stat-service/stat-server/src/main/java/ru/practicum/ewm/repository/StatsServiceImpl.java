@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import ru.practicum.ewm.dto.EndpointHitDto;
 import ru.practicum.ewm.dto.StatsDto;
 import ru.practicum.ewm.model.EndpointHitMapper;
+import ru.practicum.ewm.model.Stats;
 import ru.practicum.ewm.model.StatsMapper;
 
 import java.time.LocalDateTime;
@@ -27,16 +28,15 @@ public class StatsServiceImpl implements StatsService {
             throw new IllegalArgumentException("Дата начала не может быть позже даты конца");
         }
 
+        List<Stats> stats;
         if (unique.equals(Boolean.TRUE)) {
-            return statsRepository.findUniqueStats(start, end, uris)
-                    .stream()
-                    .map(StatsMapper::toStatsDto)
-                    .toList();
+            stats = statsRepository.findUniqueStats(start, end, uris);
         } else {
-            return statsRepository.findStats(start, end, uris)
-                    .stream()
-                    .map(StatsMapper::toStatsDto)
-                    .toList();
+            stats = statsRepository.findStats(start, end, uris);
         }
+
+        return stats.stream()
+                .map(StatsMapper::toStatsDto)
+                .toList();
     }
 }

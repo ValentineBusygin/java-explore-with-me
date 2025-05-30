@@ -38,6 +38,15 @@ public class StatsController {
                                            @RequestParam(defaultValue = "false") Boolean unique) {
         log.info("Получен запрос на получение статистики");
 
-        return ResponseEntity.ok(statsService.get(start, end, uris, unique));
+        List<String> parsedUris = null;
+        for (String uri : uris) {
+            if (uri.charAt(0) == '[') {
+                parsedUris = List.of(uri.substring(1, uri.length() - 1).split(","));
+            } else {
+                parsedUris = List.of(uri);
+            }
+        }
+
+        return ResponseEntity.ok(statsService.get(start, end, parsedUris, unique));
     }
 }

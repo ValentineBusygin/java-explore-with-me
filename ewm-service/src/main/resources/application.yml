@@ -7,7 +7,7 @@ stat-service:
 spring:
     datasource:
       driverCLassName: org.postgresql.Driver
-      url: jdbc:postgresql://localhost:5432/ewm-db
+      url: jdbc:postgresql://localhost:6542/ewm-db
       username: ewm
       password: ewm
     jpa:
