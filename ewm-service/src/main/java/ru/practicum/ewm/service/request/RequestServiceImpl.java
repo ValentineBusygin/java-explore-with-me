@@ -8,7 +8,6 @@ import ru.practicum.ewm.exception.NotFoundException;
 import ru.practicum.ewm.exception.UncorrectParameterException;
 import ru.practicum.ewm.model.event.Event;
 import ru.practicum.ewm.model.event.EventState;
-import ru.practicum.ewm.model.location.LocationMapper;
 import ru.practicum.ewm.model.request.Request;
 import ru.practicum.ewm.model.request.RequestMapper;
 import ru.practicum.ewm.model.request.RequestStatus;
@@ -84,8 +83,8 @@ public class RequestServiceImpl implements RequestService {
             throw new ConflictException("Событие " + event.getId() + " не опубликовано");
         }
         if (event.getParticipantLimit() != null && event.getParticipantLimit() > 0 &&
-                    event.getParticipantLimit() <= requestRepository.countByEventIdAndStatus(event.getId(), RequestStatus.CONFIRMED)) {
-                throw new ConflictException("Достигнут лимит заявок на участие в событии " + event.getId());
+                event.getParticipantLimit() <= requestRepository.countByEventIdAndStatus(event.getId(), RequestStatus.CONFIRMED)) {
+            throw new ConflictException("Достигнут лимит заявок на участие в событии " + event.getId());
         }
         if (requestRepository.existsByEventIdAndRequesterId(event.getId(), user.getId())) {
             throw new ConflictException("Пользователь " + user.getId() + " уже подал заявку на участие в событии " + event.getId());
