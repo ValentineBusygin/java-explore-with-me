@@ -3,6 +3,7 @@ package ru.practicum.ewm.service.user;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.ewm.dto.user.UserDto;
 import ru.practicum.ewm.dto.user.UserNewRequest;
 import ru.practicum.ewm.exception.NotFoundException;
@@ -18,6 +19,7 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
 
     @Override
+    @Transactional(readOnly = true)
     public List<UserDto> getUsers(Long[] ids, Integer from, Integer size) {
         PageRequest page = PageRequest.of(from / size, size);
         if (ids != null && ids.length > 0) {
@@ -44,6 +46,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public User getUserById(Long userId) {
         return userRepository.findById(userId).orElseThrow(
                 () -> new NotFoundException("Пользователь c ID = " + userId + " не найден"));

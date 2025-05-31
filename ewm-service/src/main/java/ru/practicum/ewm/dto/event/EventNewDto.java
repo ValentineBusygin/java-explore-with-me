@@ -11,7 +11,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.validator.constraints.Length;
-import ru.practicum.ewm.model.location.Location;
+import ru.practicum.ewm.dto.location.LocationDto;
 
 import java.time.LocalDateTime;
 
@@ -40,7 +40,7 @@ public class EventNewDto {
 
     @NotNull
     @Valid
-    private Location location;
+    private LocationDto location;
 
     private Boolean paid = false;
 

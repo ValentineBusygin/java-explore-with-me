@@ -10,6 +10,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.ewm.dto.EndpointHitDto;
 import ru.practicum.ewm.dto.StatsDto;
 import ru.practicum.ewm.dto.event.*;
@@ -58,6 +59,7 @@ public class EventServiceImpl implements EventService {
     private String applicationName;
 
     @Override
+    @Transactional(readOnly = true)
     public List<EventFullDto> getEventsByAdmin(List<Long> users, List<String> states, List<Long> categories, LocalDateTime rangeStart, LocalDateTime rangeEnd, Integer from, Integer size) {
         PageRequest pageRequest = PageRequest.of(from / size, size);
 
@@ -94,6 +96,7 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
+    @Transactional
     public EventFullDto updateEventAdmin(Long eventId, EventUpdateAdminRequest eventUpdateAdminRequest) {
         Event event = getEvent(eventId);
 
@@ -141,6 +144,7 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<EventShortDto> getEventsByPublic(String text, List<Long> categories, Boolean paid, LocalDateTime rangeStart, LocalDateTime rangeEnd, Boolean onlyAvailable, String sort, Integer from, Integer size, HttpServletRequest request) {
         if (rangeStart != null && rangeEnd != null && rangeStart.isAfter(rangeEnd)) {
             throw new UncorrectParameterException(("rangeStart > rangeEnd"));
@@ -193,6 +197,7 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public EventFullDto getEventById(Long eventId, HttpServletRequest request) {
         Event event = getEvent(eventId);
         if (!event.getState().equals(EventState.PUBLISHED)) {
@@ -209,6 +214,7 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<EventShortDto> getEventsCreatedByUser(Long userId, Integer from, Integer size) {
         getUser(userId);
 
@@ -225,6 +231,7 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
+    @Transactional
     public EventFullDto addEvent(Long userId, EventNewDto eventNewDto) {
         User user = getUser(userId);
 
@@ -241,7 +248,7 @@ public class EventServiceImpl implements EventService {
         event.setState(EventState.PENDING);
 
         if (eventNewDto.getLocation() != null) {
-            Location location = locationRepository.save(eventNewDto.getLocation());
+            Location location = locationRepository.save(LocationMapper.toLocation(eventNewDto.getLocation()));
             event.setLocation(location);
         }
 
@@ -254,6 +261,7 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public EventFullDto getEventByUserIdAndEventId(Long userId, Long eventId) {
         getUser(userId);
         Event event = getEvent(eventId, userId);
@@ -266,6 +274,7 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
+    @Transactional
     public EventFullDto updateEventByUserIdAndEventId(Long userId, Long eventId, EventUpdateUserRequest eventUpdateUserRequest) {
         getUser(userId);
 
@@ -313,6 +322,7 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<ParticipationRequestDto> getRequestsForEvent(Long userId, Long eventId) {
         getUser(userId);
         getEvent(eventId, userId);
@@ -323,6 +333,7 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
+    @Transactional
     public EventRequestStatusUpdateResult updateRequestsForEvent(Long userId, Long eventId, EventRequestStatusUpdateRequest eventRequestStatusUpdateResult) {
         getUser(userId);
         Event event = getEvent(eventId);

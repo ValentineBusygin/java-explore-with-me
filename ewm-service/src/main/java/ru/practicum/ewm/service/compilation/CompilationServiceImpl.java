@@ -3,6 +3,7 @@ package ru.practicum.ewm.service.compilation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.ewm.dto.compilation.CompilationDto;
 import ru.practicum.ewm.dto.compilation.CompilationNewDto;
 import ru.practicum.ewm.dto.compilation.CompilationUpdateDto;
@@ -21,6 +22,7 @@ public class CompilationServiceImpl implements CompilationService {
     private final EventRepository eventRepository;
 
     @Override
+    @Transactional
     public void delete(Long compId) {
         getCompilationById(compId);
 
@@ -47,6 +49,7 @@ public class CompilationServiceImpl implements CompilationService {
     }
 
     @Override
+    @Transactional
     public CompilationDto update(Long compId, CompilationUpdateDto compilationUpdateDto) {
         Compilation compilation = getCompilationById(compId);
         List<Long> eventsIds = compilationUpdateDto.getEvents();
@@ -63,6 +66,7 @@ public class CompilationServiceImpl implements CompilationService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<CompilationDto> getAll(Boolean pinned, Integer from, Integer size) {
         PageRequest pageRequest = PageRequest.of(from / size, size);
         List<Compilation> compilations;
@@ -77,6 +81,7 @@ public class CompilationServiceImpl implements CompilationService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public CompilationDto getById(Long compId) {
         return CompilationMapper.toCompilationDto(getCompilationById(compId));
     }
