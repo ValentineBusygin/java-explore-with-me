@@ -15,6 +15,7 @@ import ru.practicum.ewm.repository.StatsService;
 import ru.practicum.ewm.utils.SimpleDateTimeFormatter;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Controller
@@ -38,6 +39,15 @@ public class StatsController {
                                            @RequestParam(defaultValue = "false") Boolean unique) {
         log.info("Получен запрос на получение статистики");
 
-        return ResponseEntity.ok(statsService.get(start, end, uris, unique));
+        List<String> parsedUris = new ArrayList<>();
+        for (String uri : uris) {
+            if (uri.charAt(0) == '[') {
+                parsedUris.addAll(List.of(uri.substring(1, uri.length() - 1).split(",")));
+            } else {
+                parsedUris.add(uri);
+            }
+        }
+
+        return ResponseEntity.ok(statsService.get(start, end, parsedUris, unique));
     }
 }
