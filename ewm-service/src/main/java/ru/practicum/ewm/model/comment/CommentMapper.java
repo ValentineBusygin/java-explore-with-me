@@ -16,7 +16,7 @@ public class CommentMapper {
                 .edited(comment.getEdited())
                 .build();
     }
-    
+
     public static CommentFullAdminDto toCommentFullAdminDto(Comment comment) {
         return CommentFullAdminDto.builder()
                 .id(comment.getId())
