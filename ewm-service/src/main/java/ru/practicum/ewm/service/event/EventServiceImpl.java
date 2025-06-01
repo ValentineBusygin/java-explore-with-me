@@ -22,6 +22,7 @@ import ru.practicum.ewm.exception.ConflictException;
 import ru.practicum.ewm.exception.NotFoundException;
 import ru.practicum.ewm.exception.UncorrectParameterException;
 import ru.practicum.ewm.model.category.Category;
+import ru.practicum.ewm.model.comment.Comment;
 import ru.practicum.ewm.model.event.*;
 import ru.practicum.ewm.model.location.Location;
 import ru.practicum.ewm.model.location.LocationMapper;
@@ -30,6 +31,7 @@ import ru.practicum.ewm.model.request.RequestMapper;
 import ru.practicum.ewm.model.request.RequestStatus;
 import ru.practicum.ewm.model.user.User;
 import ru.practicum.ewm.service.category.CategoryRepository;
+import ru.practicum.ewm.service.comment.CommentRepository;
 import ru.practicum.ewm.service.location.LocationRepository;
 import ru.practicum.ewm.service.request.RequestRepository;
 import ru.practicum.ewm.service.user.UserRepository;
@@ -51,6 +53,7 @@ public class EventServiceImpl implements EventService {
     private final UserRepository userRepository;
     private final LocationRepository locationRepository;
     private final StatsClient statsClient;
+    private final CommentRepository commentRepository;
     private final ObjectMapper objectMapper;
 
     private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
@@ -90,7 +93,7 @@ public class EventServiceImpl implements EventService {
         List<EventFullDto> eventsDto = events.stream()
                 .map(EventMapper::toEventFullDto).toList();
 
-        fillViewsAndConfirmedRequests(eventsDto, events);
+        fillViewsCommentsAndConfirmedRequests(eventsDto, events);
 
         return eventsDto;
     }
@@ -191,7 +194,7 @@ public class EventServiceImpl implements EventService {
 
         List<EventShortDto> eventsShortDto = events.stream().map(EventMapper::toEventShortDto).toList();
 
-        fillViewsAndConfirmedRequests(eventsShortDto, events);
+        fillViewsCommentsAndConfirmedRequests(eventsShortDto, events);
 
         return eventsShortDto;
     }
@@ -208,7 +211,7 @@ public class EventServiceImpl implements EventService {
 
         EventFullDto eventFullDto = EventMapper.toEventFullDto(event);
 
-        fillViewsAndConfirmedRequests(List.of(eventFullDto), List.of(event));
+        fillViewsCommentsAndConfirmedRequests(List.of(eventFullDto), List.of(event));
 
         return eventFullDto;
     }
@@ -225,7 +228,7 @@ public class EventServiceImpl implements EventService {
         List<EventShortDto> eventsDto = events.stream()
                 .map(EventMapper::toEventShortDto).toList();
 
-        fillViewsAndConfirmedRequests(eventsDto, events);
+        fillViewsCommentsAndConfirmedRequests(eventsDto, events);
 
         return eventsDto;
     }
@@ -268,7 +271,7 @@ public class EventServiceImpl implements EventService {
 
         EventFullDto eventFullDto = EventMapper.toEventFullDto(event);
 
-        fillViewsAndConfirmedRequests(List.of(eventFullDto), List.of(event));
+        fillViewsCommentsAndConfirmedRequests(List.of(eventFullDto), List.of(event));
 
         return eventFullDto;
     }
@@ -459,7 +462,7 @@ public class EventServiceImpl implements EventService {
         return userRepository.findById(userId).orElseThrow(() -> new NotFoundException("User with id = " + userId + " does not exist"));
     }
 
-    private void fillViewsAndConfirmedRequests(List<? extends EventShortDto> eventsDto, List<Event> events) {
+    private void fillViewsCommentsAndConfirmedRequests(List<? extends EventShortDto> eventsDto, List<Event> events) {
         List<Request> requests = requestRepository.findAllByEventIdInAndStatus(events.stream().map(Event::getId).toList(), RequestStatus.CONFIRMED);
         Map<Long, Long> confirmedRequestsMap = requests.stream().collect(Collectors.groupingBy(r -> r.getEvent().getId(), Collectors.counting()));
 
@@ -472,6 +475,12 @@ public class EventServiceImpl implements EventService {
         for (EventShortDto eventDto : eventsDto) {
             Long count = viewsMap.getOrDefault(eventDto.getId(), 0L);
             eventDto.setViews(count);
+        }
+
+        Map<Long, Long> commentsCountMap = getEventsCommentsCount(events.stream().toList());
+        for (EventShortDto eventDto : eventsDto) {
+            Long count = commentsCountMap.getOrDefault(eventDto.getId(), 0L);
+            eventDto.setCommentsCount(count);
         }
     }
 
@@ -493,6 +502,13 @@ public class EventServiceImpl implements EventService {
         }
 
         return viewStatsMap;
+    }
+
+    private Map<Long, Long> getEventsCommentsCount(List<Event> events) {
+        List<Comment> comments = commentRepository.findAllByEventIdIn(events.stream().map(Event::getId).toList());
+
+        return comments.stream()
+                .collect(Collectors.toMap(comment -> comment.getEvent().getId(), comment -> 1L, Long::sum));
     }
 
     private Event updateEvent(Event oldEvent, EventUpdateRequest eventUpdateRequest) {
