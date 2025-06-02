@@ -2,6 +2,7 @@ package ru.practicum.ewm.service.comment;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.ewm.dto.comment.CommentFullAdminDto;
 import ru.practicum.ewm.dto.comment.CommentFullDto;
 import ru.practicum.ewm.dto.comment.CommentNewDto;
@@ -27,6 +28,7 @@ public class CommentServiceImpl implements CommentService {
     private final EventRepository eventRepository;
 
     @Override
+    @Transactional(readOnly = true)
     public List<CommentFullDto> getAllCommentsForEvent(Long eventId) {
         List<Comment> comments = commentRepository.findAllByEventIdAndNotDeletedOrderByCreatedAsc(eventId);
 
@@ -36,6 +38,7 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<CommentFullAdminDto> getAllCommentsByAdminForEvent(Long eventId) {
         List<Comment> comments = commentRepository.findAllByEventIdOrderByCreatedAsc(eventId);
 
@@ -45,6 +48,7 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
+    @Transactional
     public void deleteComment(Long commentId) {
         Comment comment = getCommentById(commentId);
         if (comment.getDeleted()) {
@@ -89,6 +93,7 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
+    @Transactional
     public CommentFullDto updateComment(Long userId, Long commentId, CommentUpdateDto commentUpdateDto) {
         User user = getUserById(userId);
         Comment comment = getCommentById(commentId);
@@ -112,11 +117,13 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public CommentFullDto getComment(Long commentId) {
         return CommentMapper.toCommentFullDto(getCommentById(commentId));
     }
 
     @Override
+    @Transactional(readOnly = true)
     public CommentFullAdminDto getCommentByAdmin(Long commentId) {
         return CommentMapper.toCommentFullAdminDto(getCommentById(commentId, true));
     }

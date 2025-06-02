@@ -12,7 +12,6 @@ import ru.practicum.ewm.service.comment.CommentService;
 @RestController
 @RequestMapping("/comments")
 @RequiredArgsConstructor
-
 public class PrivateCommentController {
     private final CommentService commentService;
 
