@@ -22,4 +22,5 @@ public class EventShortDto {
     protected Boolean paid;
     protected String title;
     protected Long views;
+    protected Long commentsCount;
 }
